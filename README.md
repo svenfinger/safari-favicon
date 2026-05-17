@@ -1,0 +1,1 @@
+# safari-favicon-tester
