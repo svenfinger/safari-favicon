@@ -4,29 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Safari Favicon Tester</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Safari Favicon Tester</h1>
-  <p>Pick a PNG from your computer. Nothing is uploaded — everything runs in your browser.</p>
-  <p><strong>Note:</strong> Safari’s favicon background rules are undocumented. This is an approximation. Validate in Safari when it matters.</p>
+  <main class="app">
+    <h1>Safari Favicon Tester</h1>
+    <p class="lead">Pick a PNG from your computer. Nothing is uploaded — everything runs in your browser.</p>
+    <p class="note"><strong>Note:</strong> Safari’s favicon background rules are undocumented. This is an approximation. Validate in Safari when it matters.</p>
 
-  <p>
-    <label>
-      PNG favicon:
-      <input type="file" id="file" accept="image/png">
-    </label>
-  </p>
+    <p class="upload">
+      <label class="upload__label">
+        <span class="upload__text">PNG favicon</span>
+        <input type="file" id="file" class="upload__input" accept="image/png">
+      </label>
+    </p>
 
-  <div id="output" hidden>
-    <h2>Checklist</h2>
-    <ul id="checklist"></ul>
+    <div id="output" hidden>
+      <h2>Checklist</h2>
+      <ul id="checklist"></ul>
 
-    <h2>Light mode (predicted)</h2>
-    <canvas id="light" width="16" height="16" style="width:96px;height:96px;image-rendering:pixelated;"></canvas>
-
-    <h2>Dark mode (predicted)</h2>
-    <canvas id="dark" width="16" height="16" style="width:96px;height:96px;image-rendering:pixelated;"></canvas>
-  </div>
+      <div class="previews">
+        <section class="preview">
+          <h2>Light mode (predicted)</h2>
+          <canvas id="light" width="16" height="16"></canvas>
+        </section>
+        <section class="preview">
+          <h2>Dark mode (predicted)</h2>
+          <canvas id="dark" width="16" height="16"></canvas>
+        </section>
+      </div>
+    </div>
+  </main>
 
   <script>
     const FAVICON_SIZE = 16;
@@ -314,7 +322,17 @@
 
     function addCheck(level, text) {
       const li = document.createElement('li');
-      li.textContent = `[${level.toUpperCase()}] ${text}`;
+      li.className = `check check--${level}`;
+
+      const badge = document.createElement('span');
+      badge.className = 'check__badge';
+      badge.textContent = level;
+
+      const textEl = document.createElement('span');
+      textEl.className = 'check__text';
+      textEl.textContent = text;
+
+      li.append(badge, textEl);
       checklistEl.appendChild(li);
     }
 
