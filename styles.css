@@ -128,8 +128,36 @@ h1 {
   color: var(--muted);
 }
 
-#output h2:first-child {
+#output h2:first-of-type {
   margin-top: 0;
+}
+
+.summary {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.summary--good {
+  color: var(--pass);
+  border-color: color-mix(in srgb, var(--pass) 35%, var(--border));
+  background: color-mix(in srgb, var(--pass) 8%, var(--surface));
+}
+
+.summary--attention {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 35%, var(--border));
+  background: color-mix(in srgb, var(--warn) 10%, var(--surface));
+}
+
+.summary--failed {
+  color: var(--fail);
+  border-color: color-mix(in srgb, var(--fail) 35%, var(--border));
+  background: color-mix(in srgb, var(--fail) 8%, var(--surface));
 }
 
 #checklist {

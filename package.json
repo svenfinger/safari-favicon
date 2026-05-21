@@ -1,0 +1,46 @@
+{
+  "name": "safari-favicon",
+  "version": "0.1.0",
+  "description": "Test and validate Safari favicons",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "bin": {
+    "safari-favicon": "./bin/safari-favicon.js"
+  },
+  "files": [
+    "README.md",
+    "LICENSE.md",
+    "lib/",
+    "cli.js",
+    "bin/"
+  ],
+  "scripts": {
+    "check": "node cli.js test/fixtures/sample.png",
+    "test": "node --test test/*.test.js",
+    "start": "npx --yes serve . -p 3000"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/svenfinger/safari-favicon.git"
+  },
+  "author": "Sven Finger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/svenfinger/safari-favicon/issues"
+  },
+  "keywords": [
+    "safari",
+    "favicon",
+    "cli"
+  ],
+  "homepage": "https://github.com/svenfinger/safari-favicon#readme",
+  "dependencies": {
+    "pngjs": "^7.0.0"
+  }
+}
