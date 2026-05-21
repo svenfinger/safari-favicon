@@ -1,5 +1,8 @@
 # Safari Favicon
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+[![npm version](https://img.shields.io/npm/v/safari-favicon.svg)](https://www.npmjs.com/package/safari-favicon)
+
 Check PNG favicons for Safari tab rendering issues (contrast, transparency, predicted accent borders/plates). Rules are approximate, because the Safari behavior is undocumented.
 
 The CLI decodes PNGs with [pngjs](https://github.com/lukeapage/pngjs) (pure JavaScript, no native binaries) and scales them to 16×16 before analysis.
