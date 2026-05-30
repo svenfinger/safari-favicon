@@ -45,6 +45,38 @@ test('bin entry runs without stderr', () => {
   assert.equal(result.stderr, '');
 });
 
+test('--json prints a valid, parseable result', () => {
+  const result = runCli([join(fixturesDir, 'light-on-transparent.png'), '--json']);
+  assert.equal(result.status, 0);
+  assert.equal(result.stderr, '');
+
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.file, join(fixturesDir, 'light-on-transparent.png'));
+  assert.match(parsed.version, /^\d+\.\d+\.\d+$/);
+  assert.equal(parsed.verdict, 'attention');
+  assert.equal(parsed.ok, true);
+  assert.ok(Array.isArray(parsed.checks));
+  assert.equal(parsed.lightMode.treatment, 'plate');
+  assert.equal(parsed.darkMode.treatment, 'none');
+});
+
+test('--json on a failing favicon still emits JSON and exits 1', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'safari-favicon-'));
+  const path = join(dir, 'empty.png');
+  const png = new PNG({ width: 16, height: 16 });
+  png.data.fill(0);
+  writeFileSync(path, PNG.sync.write(png));
+  try {
+    const result = runCli([path, '--json']);
+    assert.equal(result.status, 1);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed.ok, false);
+    assert.equal(parsed.verdict, 'failed');
+  } finally {
+    rmSync(dir, { recursive: true });
+  }
+});
+
 test('--version', () => {
   const result = runCli(['--version']);
   assert.equal(result.status, 0);

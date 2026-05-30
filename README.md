@@ -32,6 +32,16 @@ safari-favicon --version
 safari-favicon --help
 ```
 
+**JSON output**
+
+Pass `--json` to print the full result (the same `CheckResult` returned by the API, plus `file` and `version`) as JSON instead of human-readable text. Useful for scripting and CI:
+
+```bash
+safari-favicon path/to/favicon.png --json
+```
+
+> The JSON shape is not yet frozen; it will be stabilized when the public API is locked for 1.0.
+
 **Exit codes**
 
 - `0` — checks passed (warnings are OK)
@@ -50,6 +60,8 @@ import {
   FAVICON_SIZE,
 } from 'safari-favicon';
 ```
+
+The package ships TypeScript declarations (`types/*.d.ts`), so editors get autocomplete and types for `CheckResult`, `FaviconAnalysis`, `ModePrediction`, and the rest without any extra setup.
 
 ### `checkFavicon(filePath, options?)`
 
@@ -93,8 +105,11 @@ Recompute `{ score, verdict, ok }` from a `Check[]` array.
 npm install
 npm test          # API, CLI, and PNG loading tests on test/fixtures/*.png
 npm run check     # quick CLI run on test/fixtures/sample.png
+npm run build:types  # generate types/*.d.ts from JSDoc (auto-runs on prepack)
 npm start         # local web UI at http://localhost:3000
 ```
+
+The published package's `types/` declarations are generated from the JSDoc in `lib/` by `tsc` (declaration-only). They're git-ignored and rebuilt automatically before packing/publishing via the `prepack` hook.
 
 ## Web UI
 

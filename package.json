@@ -4,8 +4,12 @@
   "description": "Test and validate Safari favicons",
   "type": "module",
   "main": "./lib/index.js",
+  "types": "./types/index.d.ts",
   "exports": {
-    ".": "./lib/index.js"
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./lib/index.js"
+    }
   },
   "bin": {
     "safari-favicon": "./bin/safari-favicon.js"
@@ -14,12 +18,15 @@
     "README.md",
     "LICENSE.md",
     "lib/",
+    "types/",
     "cli.js",
     "bin/"
   ],
   "scripts": {
     "check": "node cli.js test/fixtures/sample.png",
     "test": "node --test test/*.test.js",
+    "build:types": "tsc -p tsconfig.json",
+    "prepack": "npm run build:types",
     "start": "npx --yes serve . -p 3000"
   },
   "engines": {
@@ -42,5 +49,8 @@
   "homepage": "https://github.com/svenfinger/safari-favicon#readme",
   "dependencies": {
     "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
   }
 }

@@ -8,22 +8,36 @@ const { version } = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 );
 
-const USAGE = `Usage: safari-favicon <path-to.png>
+const USAGE = `Usage: safari-favicon <path-to.png> [options]
 
 Check a PNG favicon for likely Safari tab rendering issues.
+
+Options:
+  --json         Print the full result as JSON instead of human-readable text.
+  -v, --version  Print the version and exit.
+  -h, --help     Print this help and exit.
+
 Exit code 0 when checks pass; 1 on invalid input or failed checks.`;
 
 async function main(argv) {
-  const filePath = argv[0];
+  const flags = new Set(argv.filter((arg) => arg.startsWith('-')));
+  const positionals = argv.filter((arg) => !arg.startsWith('-'));
+  const filePath = positionals[0];
+  const asJson = flags.has('--json');
 
-  if (filePath === '-v' || filePath === '--version') {
+  if (flags.has('-v') || flags.has('--version')) {
     console.log(version);
     process.exit(0);
   }
 
-  if (!filePath || filePath === '-h' || filePath === '--help') {
+  if (flags.has('-h') || flags.has('--help')) {
     console.log(USAGE);
-    process.exit(filePath ? 0 : 1);
+    process.exit(0);
+  }
+
+  if (!filePath) {
+    console.log(USAGE);
+    process.exit(1);
   }
 
   try {
@@ -45,6 +59,11 @@ async function main(argv) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`Error: ${message}`);
     process.exit(1);
+  }
+
+  if (asJson) {
+    console.log(JSON.stringify({ file: filePath, version, ...result }, null, 2));
+    process.exit(result.ok ? 0 : 1);
   }
 
   console.log(`safari-favicon — ${filePath}\n`);
