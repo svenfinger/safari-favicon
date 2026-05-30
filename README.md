@@ -99,4 +99,4 @@ The web UI is not included in the npm package. To run it locally, open `index.ht
 
 ## License
 
-[MIT](LICENSE.md)
+[MIT](LICENSE)
