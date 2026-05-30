@@ -5,7 +5,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { PNG } from 'pngjs';
 import { CASES, VERDICT_CLI_LABEL } from './cases.js';
+import { MAX_SOURCE_SIZE } from '../lib/constants.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const fixturesDir = join(root, 'test/fixtures');
@@ -73,6 +75,22 @@ test('non-.png extension exits 1', () => {
     const result = runCli([path]);
     assert.equal(result.status, 1);
     assert.match(result.stderr, /\.png/);
+  } finally {
+    rmSync(dir, { recursive: true });
+  }
+});
+
+test('oversized PNG (> MAX_SOURCE_SIZE) exits 1 with a clear message', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'safari-favicon-'));
+  const path = join(dir, 'too-big.png');
+  const size = MAX_SOURCE_SIZE + 88;
+  const png = new PNG({ width: size, height: size });
+  png.data.fill(255);
+  writeFileSync(path, PNG.sync.write(png));
+  try {
+    const result = runCli([path]);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /maximum/);
   } finally {
     rmSync(dir, { recursive: true });
   }

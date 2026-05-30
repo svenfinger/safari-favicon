@@ -3,6 +3,7 @@ import { analyze } from './lib/analyze.js';
 import { buildChecklist } from './lib/checklist.js';
 import { formatResultSummary } from './lib/format-cli.js';
 import { predictMode } from './lib/predict.js';
+import { mapToFaviconSize } from './lib/resize.js';
 import { renderPredicted } from './web/render-preview.js';
 
 const fileInput = document.getElementById('file');
@@ -99,18 +100,39 @@ function loadImage(src, fileName) {
 }
 
 function runAnalysis(img, fileName) {
-  const source = document.createElement('canvas');
-  source.width = FAVICON_SIZE;
-  source.height = FAVICON_SIZE;
-  const ctx = source.getContext('2d', { willReadFrequently: true });
-  ctx.clearRect(0, 0, FAVICON_SIZE, FAVICON_SIZE);
-  ctx.drawImage(img, 0, 0, FAVICON_SIZE, FAVICON_SIZE);
-  const imageData = ctx.getImageData(0, 0, FAVICON_SIZE, FAVICON_SIZE);
+  const sourceWidth = img.naturalWidth;
+  const sourceHeight = img.naturalHeight;
+
+  // Decode at full resolution, then apply the same size policy as the CLI
+  // (reject > 512, area-average downscale, bilinear upscale) via the shared
+  // module — so the web UI and CLI stay in lockstep.
+  let mapped;
+  try {
+    const full = document.createElement('canvas');
+    full.width = sourceWidth;
+    full.height = sourceHeight;
+    const fctx = full.getContext('2d', { willReadFrequently: true });
+    fctx.clearRect(0, 0, sourceWidth, sourceHeight);
+    fctx.drawImage(img, 0, 0);
+    const srcData = fctx.getImageData(0, 0, sourceWidth, sourceHeight).data;
+    mapped = mapToFaviconSize(srcData, sourceWidth, sourceHeight);
+  } catch (err) {
+    output.hidden = true;
+    alert(err instanceof Error ? err.message : String(err));
+    fileInput.value = '';
+    return;
+  }
+
+  const imageData = new ImageData(mapped.data, FAVICON_SIZE, FAVICON_SIZE);
 
   const analysis = analyze(imageData);
   const lightMode = predictMode(analysis, 'light');
   const darkMode = predictMode(analysis, 'dark');
-  const result = buildChecklist(fileName, analysis, lightMode, darkMode);
+  const result = buildChecklist(fileName, analysis, lightMode, darkMode, {
+    sourceWidth: mapped.sourceWidth,
+    sourceHeight: mapped.sourceHeight,
+    scaling: mapped.scaling,
+  });
 
   renderPredicted(lightCanvas, imageData, TAB_LIGHT, lightMode);
   renderPredicted(darkCanvas, imageData, TAB_DARK, darkMode);

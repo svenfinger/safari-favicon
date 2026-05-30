@@ -5,7 +5,12 @@
 
 Check PNG favicons for Safari tab rendering issues (contrast, transparency, predicted accent borders/plates). Rules are approximate, because the Safari behavior is undocumented.
 
-The CLI decodes PNGs with [pngjs](https://github.com/lukeapage/pngjs) (pure JavaScript, no native binaries) and scales them to 16×16 before analysis.
+The CLI decodes PNGs with [pngjs](https://github.com/lukeapage/pngjs) and maps them to Safari's 16×16 tab size before analysis:
+
+- **16×16** — analyzed as-is, no resampling.
+- **Larger (up to 512×512)** — area-average downscale. Safari accepts larger favicons and downscales them, so this is normal; a high-res source is fine and recommended.
+- **Smaller than 16×16** — bilinear upscale, flagged as a warning. Safari still renders it, but upscaled tiny art looks blurry; ship at least 32×32.
+- **Larger than 512×512** — rejected. This is a tool limit (to bound runtime and keep the favicon framing), not a Safari restriction.
 
 ## CLI
 
@@ -60,7 +65,7 @@ Options: `{ fileName?: string }` — label used in checklist messages (defaults 
 
 ### `loadPngFromPath(filePath)`
 
-Load and scale a PNG to `FAVICON_SIZE` (16×16). Returns `{ data, width, height }` (RGBA, `Uint8ClampedArray`).
+Load and scale a PNG to `FAVICON_SIZE` (16×16). Returns `{ data, width, height, sourceWidth, sourceHeight, scaling }` where `data` is RGBA (`Uint8ClampedArray`) and `scaling` is `'none' | 'downscaled' | 'upscaled'`. Throws if the source is larger than 512×512 on either side.
 
 ### `analyze(imageData)`
 
